@@ -79,14 +79,15 @@ void hash_table_v1_add_entry(struct hash_table_v1 *hash_table, const char *key, 
 	struct list_entry *list_entry = get_list_entry(hash_table, key, list_head);
 	
 
+	errno = pthread_mutex_lock(&hash_table->mutex);
+	if(errno){ exit(errno);}
 	/* Update the value if it already exists */
 	if (list_entry != NULL) {
 		list_entry->value = value;
+		errno = pthread_mutex_unlock(&hash_table->mutex);
+		if(errno){ exit(errno);}
 		return;
 	}
-	
-	errno = pthread_mutex_lock(&hash_table->mutex);
-	if(errno){ exit(errno);}
 
 	list_entry = calloc(1, sizeof(struct list_entry));
 	list_entry->key = key;
